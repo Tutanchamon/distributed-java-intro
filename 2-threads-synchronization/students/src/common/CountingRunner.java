@@ -11,6 +11,7 @@ public class CountingRunner {
 
     public void execute(Counter counter) throws InterruptedException {
         ExecutorService executors = Executors.newCachedThreadPool();
+        long beginning = System.currentTimeMillis();
         for (int i = 0; i < numberOfThreads; ++i) {
             executors.execute(new CountingTask(counter, numberOfIterations));
         }
@@ -18,5 +19,7 @@ public class CountingRunner {
         executors.awaitTermination(30, TimeUnit.SECONDS);
 
         System.out.println("Actual: " + counter.getValue() + ", Expected: " + (numberOfThreads * numberOfIterations));
+        long ending = System.currentTimeMillis();
+        System.out.println("Execution time: " + (double) (ending - beginning) / 1000);
     }
 }
