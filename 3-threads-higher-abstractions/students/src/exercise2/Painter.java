@@ -9,6 +9,7 @@ public class Painter implements Runnable {
 
     private final Paints paints;
     private final Brushes brushes;
+    
 
     public Painter(Paints paints, Brushes brushes) {
         this.paints = paints;
