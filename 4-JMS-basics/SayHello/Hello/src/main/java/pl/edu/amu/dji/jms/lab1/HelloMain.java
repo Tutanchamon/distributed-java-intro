@@ -22,10 +22,11 @@ public class HelloMain {
         - topic name should be "SayHelloTopic"
          */
 
-        Connection connection = null;
-        Session session = null;
-        Destination queue = null;
-        MessageConsumer consumer = null;
+        Connection connection = connectionFactory.createConnection();
+        Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+        Destination queue = session.createQueue("SayHelloQueue");
+//        Topic topic = session.createTopic("SayHelloTopic");
+        MessageConsumer consumer = session.createConsumer(queue, "hasDots = true");
 
         /*
         Create MessageConsumer instance from session (check Session class and createConsumer method)
@@ -39,12 +40,22 @@ public class HelloMain {
         MessageListener helloListener = new MessageListener() {
             @Override
             public void onMessage(Message message) {
-                throw new UnsupportedOperationException();
+                if (message instanceof TextMessage) {
+                    TextMessage textMessage = (TextMessage) message;
+                    try {
+                        System.out.println(textMessage.getText());
+                        System.out.println(textMessage.getBooleanProperty("hasDots") ? "ma kropeczki" : "nie ma kropeczek");
+                    } catch (JMSException ex) {
+                        System.out.println(ex.getMessage());
+                    }
+                }
             }
         };
 
         //Set MessageListener implementation as a message listener in MessageConsumer
-
+        
+        consumer.setMessageListener(helloListener);
         connection.start();
+        
     }
 }
