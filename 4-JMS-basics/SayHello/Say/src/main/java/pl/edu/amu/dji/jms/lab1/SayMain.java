@@ -12,7 +12,12 @@ public class SayMain {
 
     public static void main(String[] args) throws Exception {
         ConnectionFactory connectionFactory = new ActiveMQConnectionFactory("tcp://localhost:61616");
+        Connection connection = connectionFactory.createConnection();
+        Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+        Destination queue = session.createQueue("SayHelloQueue");
+        MessageProducer producer = session.createProducer(queue);
 
+<<<<<<< HEAD
         /*
          Create Connection instance from ConnectionFactory
 
@@ -31,14 +36,16 @@ public class SayMain {
         MessageProducer producer = session.createProducer(queue);
         producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
         producer.setTimeToLive(3000);
+=======
+        producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
+>>>>>>> 70355818d5ae88cb22052c3f9bfc9fe16bb8925a
 
         connection.start();
-
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
-
-        String text = "";
-        while (!text.equalsIgnoreCase(EXIT)) {
+        String in = "";
+        while (!in.equalsIgnoreCase(EXIT)) {
             System.out.print("Say hello to:");
+<<<<<<< HEAD
             text = bufferedReader.readLine();
 
             //Create TextMessage from session with text variable
@@ -47,9 +54,13 @@ public class SayMain {
             textMessage.setBooleanProperty("hasDots", text.contains((".")));
             
             producer.send(queue, textMessage);
+=======
+            in = bufferedReader.readLine();
+            TextMessage message = session.createTextMessage(in);
+            producer.send(message);
+>>>>>>> 70355818d5ae88cb22052c3f9bfc9fe16bb8925a
         }
 
-        //Close stuff
         session.close();
         connection.close();
     }
