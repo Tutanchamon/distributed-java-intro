@@ -16,5 +16,16 @@
     <bean id="offerTopic" class="org.apache.activemq.command.ActiveMQTopic">
         <constructor-arg value="offerTopic"/>
     </bean>
+    
+    <bean id="buyService" class="pl.edu.amu.dji.jms.lab2.retailer.service.BuyService">
+        <property name="jmsTemplate" ref="jmsTemplate"/>
+        <property name="maxPrice" value="7823.45"/>
+    </bean>
+    
+    <bean id="messageListener" class="org.springframework.jms.listener.SimpleMessageListenerContainer">
+        <property name="messageListener" ref="buyService"/>
+        <property name="connectionFactory" ref="connectionFactory" />
+        <property name="destination" ref="offerTopic"/>
+    </bean>
 
 </beans>
