@@ -116,9 +116,7 @@ public class Chairman extends Thread {
                         //currentAuction.setWinner(randomWinner);
                         randomWinner.addItem(currentAuction.getItem());
                     }
-                    for (Recipient recipient : currentAuction.getRecipients()) {
-                        recipient.setRegisteredInAuction(false);
-                    }
+                    currentAuction.setActive(false);
                     log.info("Auction finished - there are {} more auctions in the queue", fleaMarket.getAuctions().size());
 
                 } catch (InterruptedException ex) {
