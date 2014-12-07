@@ -55,6 +55,9 @@ public class Chairman extends Thread {
                     log.info("Registering {}", recipient);
                     return registered;
                 }
+                else {
+                    log.info("Nie zarejestrował - za dużo");
+                }
             }
         } catch (NullPointerException ex) {
             log.error("NullPointerException", ex);

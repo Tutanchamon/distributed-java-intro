@@ -28,9 +28,9 @@ public class MarketManager extends Thread {
     
     public MarketManager(String name) {
         this.managerName = name;
-        MAX_DONORS = random.nextInt(10)+1;
+        MAX_DONORS = random.nextInt(25)+1;
         log.debug("Market Manager {} allows max {} donors", managerName, MAX_DONORS);
-        MAX_RECIPENTS = random.nextInt(15)+1;
+        MAX_RECIPENTS = random.nextInt(150)+1;
         log.debug("Market Manager {} allows max {} recipents", managerName, MAX_RECIPENTS);
         MAX_AUCTIONS = random.nextInt(50)+1;
     }
