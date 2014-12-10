@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context
+                           http://www.springframework.org/schema/context/spring-context.xsd
+                           http://www.springframework.org/schema/tx
+                           http://www.springframework.org/schema/tx/spring-tx.xsd
+                           ">
+
+    <context:component-scan base-package="pl.edu.amu.dji.jms.lab2.wholesaler.*"/>
+    <tx:annotation-driven/>
+
+    <!-- Common beans -->
+    <bean id="connectionFactory" class="org.apache.activemq.pool.PooledConnectionFactory" destroy-method="stop">
+        <property name="connectionFactory">
+            <bean class="org.apache.activemq.ActiveMQConnectionFactory">
+                <property name="brokerURL" value="tcp://localhost:61616"/>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="transactionManager" class="org.springframework.jms.connection.JmsTransactionManager">
+        <property name="connectionFactory" ref="connectionFactory"/>
+    </bean>
+    
+    <bean id="sellProductTopic" class="org.apache.activemq.command.ActiveMQTopic">
+        <constructor-arg value="sellProductTopic"/>
+    </bean>
+    
+    <bean id="reportingService" class="org.fomfel.supermarket.reporting.ReportingService">
+    </bean>
+    
+    <bean id="reportingListenerContainer" class="org.springframework.jms.listener.SimpleMessageListenerContainer">
+        <property name="messageListener" ref="reportingService"/>
+        <property name="connectionFactory" ref="connectionFactory"/>
+        <property name="destination" ref="sellProductTopic"/>
+    </bean>
+</beans>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context
+                           http://www.springframework.org/schema/context/spring-context.xsd
+                           http://www.springframework.org/schema/tx
+                           http://www.springframework.org/schema/tx/spring-tx.xsd
+                           ">
+
+    <context:component-scan base-package="pl.edu.amu.dji.jms.lab2.wholesaler.*"/>
+    <tx:annotation-driven/>
+
+    <!-- Common beans -->
+    <bean id="connectionFactory" class="org.apache.activemq.pool.PooledConnectionFactory" destroy-method="stop">
+        <property name="connectionFactory">
+            <bean class="org.apache.activemq.ActiveMQConnectionFactory">
+                <property name="brokerURL" value="tcp://localhost:61616"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <bean id="defaultJmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+        <property name="connectionFactory" ref="connectionFactory"/>
+        <property name="sessionTransacted" value="true"/>
+    </bean>
+
+    <bean id="transactionManager" class="org.springframework.jms.connection.JmsTransactionManager">
+        <property name="connectionFactory" ref="connectionFactory"/>
+    </bean>
+    
+    <bean id="pointOfSaleHolder" class="org.fomfel.supermarket.pointofsale.PointOfSaleHolder">
+    </bean>
+    
+    <!-- Selling products -->
+    <bean id="sellProductJmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+        <property name="connectionFactory" ref="connectionFactory"/>
+        <property name="sessionTransacted" value="true"/>
+    </bean>
+    
+    <bean id="sellProductTopic" class="org.apache.activemq.command.ActiveMQTopic">
+        <constructor-arg value="sellProductTopic"/>
+    </bean>
+    
+    <bean id="productSaleService" class="org.fomfel.supermarket.pointofsale.ProductSaleService">
+        <property name="jmsTemplate" ref="defaultJmsTemplate" />
+        <property name="reportingTopic" ref="sellProductTopic" />  
+    </bean>
+    
+    <!-- Full product list related stuff -->
+    <bean id="productListTopic" class="org.apache.activemq.command.ActiveMQTopic">
+        <constructor-arg value="productListTopic"/>
+    </bean>
+    
+    <bean id="productListService" class="org.fomfel.supermarket.pointofsale.ProductListService">
+        <property name="posHolder" ref="pointOfSaleHolder"/>
+    </bean>
+    
+    <bean id="productListListenerContainer" class="org.springframework.jms.listener.SimpleMessageListenerContainer">
+        <property name="messageListener" ref="productListService"/>
+        <property name="connectionFactory" ref="connectionFactory"/>
+        <property name="destination" ref="productListTopic"/>
+    </bean>
+    <!-- Product price change related stuff -->
+    <bean id="productPriceChangeTopic" class="org.apache.activemq.command.ActiveMQTopic">
+        <constructor-arg value="productPriceChangeTopic"/>
+    </bean>
+    
+    <bean id="productPriceChangeService" class="org.fomfel.supermarket.pointofsale.PriceChangeService">
+        <property name="posHolder" ref="pointOfSaleHolder"/>
+    </bean>
+    
+    <bean id="productPriceChangeContainer" class="org.springframework.jms.listener.SimpleMessageListenerContainer">
+        <property name="messageListener" ref="productPriceChangeService"/>
+        <property name="connectionFactory" ref="connectionFactory"/>
+        <property name="destination" ref="productPriceChangeTopic"/>
+    </bean>
+
+
+</beans>
